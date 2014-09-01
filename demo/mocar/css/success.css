@@ -1,0 +1,70 @@
+/************************  预约成功  ************************/
+#car-success{
+    height: 100%;
+    position: static;
+}
+
+.success-header {
+    background-color: #333333;
+    color: #EAEAEA;
+}
+#schedule-info{
+    overflow: hidden;
+    clear: both;
+    padding-top: 20px
+}
+#schedule-success .second{
+    width: 49%;
+    display: inline-block;
+    height: 100%;
+    font-size: 20px;
+}
+#schedule-success .second{
+    float: right;
+    margin-left: 2%;
+    width: 49%;
+}
+
+.justify{
+    display: table;
+    height: 100%;
+    width: 100%;
+}
+#schedule-success .content-area{
+    margin-left: 40px;
+}
+
+/*提示文案区*/
+#schedule-success #success-tip .site-icons{
+    margin-top: 20px;
+}
+/*表单区域 图表样式*/
+#schedule-success .site-icons{
+    margin-top: 0;
+}
+/*提示文案区*/
+#schedule-success #success-tip .content-area{
+    height: 60px;
+}
+
+#schedule-success #success-tip .tip{   
+    display: table-cell;
+    vertical-align: middle;
+    font-size: 16px;
+}
+#schedule-success .info{
+    font-size: 16px;
+}
+/*附件单行*/
+#service-detail .form-row{
+    height: 60px;
+}
+#schedule-success .accessory{
+    color: #60C900;
+    margin-bottom: 2px;
+}
+#schedule-success .last{
+    float: right;
+    margin-right: 20px;
+    color: #8C8C8C;
+}

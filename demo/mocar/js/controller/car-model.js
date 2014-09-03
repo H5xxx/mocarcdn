@@ -18,6 +18,12 @@ define(function(require, exports) {
                 Series.fetch(params),
                 Brand.fetch(params)
             ], function(list){
+                list.forEach(function(m){
+                    m = Model.find(m.id);
+                    m.brandId = params.brand_id;
+                    m.seriesId = params.series_id;
+                    m.save();
+                });
                 data = $.extend(
                     {
                         list: list

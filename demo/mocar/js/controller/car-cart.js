@@ -2,6 +2,7 @@
  * 选择服务类型和配件页面的controller
  */
 define(function(require, exports) {
+    var config = require('../component/config');
     var util = require('../component/util');
     var Vehicle = require('../model/vehicle');
     var Service = require('../model/service');
@@ -22,7 +23,7 @@ define(function(require, exports) {
 
         getData: function(params, callback){
             
-            var url = ['http://api.mocar.cn/models/',params.model_id,'/services/', params.service_id].join('');
+            var url = [config.API_HOST + '/models/',params.model_id,'/services/', params.service_id].join('');
             $.ajax({
                 url:url,
                 success:function(data, status, xhr){
@@ -91,7 +92,7 @@ define(function(require, exports) {
                         'id': params.service_id,
                         'parts': params.currentService.parts.map(function(p){
                             return {
-                                typeId: p.options[0].typeId
+                                typeId: p.id
                             }
                         })
                     }]
@@ -131,6 +132,8 @@ define(function(require, exports) {
                         if(!currentVehicle){//新选的车，加入用户车辆列表
                             currentVehicle = Model.find(params.model_id);
                             if(currentVehicle){
+                                currentVehicle.modelId = currentVehicle.id;
+                                currentVehicle.save();
                                 vehicles.unshift(currentVehicle);
                             }else{
                                 //非法路径进入
@@ -146,6 +149,8 @@ define(function(require, exports) {
                         //新选的车，加到用户车辆列表
                         currentVehicle = Model.find(params.model_id);
                         if(currentVehicle){
+                            currentVehicle.modelId = currentVehicle.id;
+                            currentVehicle.save();
                             vehicles =[currentVehicle];
                         } 
                     }
@@ -228,7 +233,7 @@ define(function(require, exports) {
             ];
             for(var i = 0, ilen = data.currentService.parts.length; i < ilen; i++){
                 optArrs.push([].concat(data.currentService.parts[i].options.map(function(opt){
-                    return [opt.brand + opt.name + " " + opt.extra, opt.price + '元']
+                    return [opt.brand + opt.name + " " + opt.extra, opt.price + '&nbsp;']
                 })));
             }
             var selectWrappers = document.querySelectorAll('.select-wrapper');

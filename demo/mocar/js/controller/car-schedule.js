@@ -2,6 +2,7 @@
  * 预约上门信息 页面的controller
  */
 define(function(require, exports) {
+    var config = require('../component/config');
     var util = require('../component/util');
     var City = require('../model/city');
     var Order = require('../model/order');
@@ -169,12 +170,12 @@ define(function(require, exports) {
                 var d = new Date(self.currrentOrder.day + " " + self.currrentOrder.time);
                 self.currrentOrder.date = d.valueOf();
                 self.currrentOrder.save();
-                var url = 'http://api.mocar.cn/user/me/orders';
+                var url = config.API_HOST + '/users/me/orders';
                 $.ajax({
                     type: 'POST',
                     url: url,
                     contentType: 'application/json',
-                    data: {
+                    data: JSON.stringify({
                         "modelId": self.currrentOrder.modelId,
                         "cityCode": self.currrentOrder.cityCode,
                         "name": self.currrentOrder.name,
@@ -182,7 +183,7 @@ define(function(require, exports) {
                         "phone": self.currrentOrder.phone,
                         "date": self.currrentOrder.date,
                         "services": self.currrentOrder.services
-                    },
+                    }),
                     success: function(responseData, status, xhr) {
                         self.page.navigate('/service/' + data.service_id + '/model/' + data.model_id + '/success');
                     },

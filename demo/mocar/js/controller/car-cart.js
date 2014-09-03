@@ -65,48 +65,49 @@ define(function(require, exports) {
             setTimeout(function(){
                 initPopupAndCustomSelect.call(self, params);
             }, 500);
-            //TODO Order.find("-1") first
+            //每次进入选配件页面，都删除之前未保存/刚刚提交的订单
             try{
-                this.currrentOrder = Order.find("-1");
+                this.currentOrder = Order.find("-1");
+                if(this.currentOrder){
+                    this.currentOrder.destroy();
+                }
             }catch(e){
-
             }
-            if(!this.currrentOrder){
-                this.currrentOrder = Order.create({
-                    "id": '-1',
-                    "sum" : 0,
-                    "modelId" : params.currentVehicle.modelId,
-                    "model" : params.currentVehicle.model,
-                    "vid" : params.currentVehicle.vid,
-                    "plate" : params.currentVehicle.plate,
-                    "cityCode" : '',
-                    "province" : '',
-                    "city" : '',
-                    "address" : "",
-                    "name" : "",
-                    "phone" : "",
-                    "date": 0,
-                    "__currentService": params.currentService,
-                    "__currentVehicle": params.currentVehicle,
-                    "services" : [{
-                        'id': params.service_id,
-                        'parts': params.currentService.parts.map(function(p){
-                            return {
-                                typeId: p.id
-                            }
-                        })
-                    }]
-                });
-            }
+            delete this.currentOrder;
+            this.currentOrder = Order.create({
+                "id": '-1',
+                "sum" : 0,
+                "modelId" : params.currentVehicle.modelId,
+                "model" : params.currentVehicle.model,
+                "vid" : params.currentVehicle.vid,
+                "plate" : params.currentVehicle.plate,
+                "cityCode" : '',
+                "province" : '',
+                "city" : '',
+                "address" : "",
+                "name" : "",
+                "phone" : "",
+                "date": 0,
+                "__currentService": params.currentService,
+                "__currentVehicle": params.currentVehicle,
+                "services" : [{
+                    'id': params.service_id,
+                    'parts': params.currentService.parts.map(function(p){
+                        return {
+                            typeId: p.id
+                        }
+                    })
+                }]
+            });
             
             var nextStepBtn = this.el.find('.j-nextstep');
             //表单信息收集
             nextStepBtn.bind('click', function(e){
                 var accessoryInput = self.el.find('input[name=accessoryInput]');
                 accessoryInput.forEach(function(input, i){
-                    self.currrentOrder.services[0].parts[i].id = params.currentService.parts[i].options[input.value].id;
+                    self.currentOrder.services[0].parts[i].id = params.currentService.parts[i].options[input.value].id;
                 });
-                self.currrentOrder.save();
+                self.currentOrder.save();
             });
         },
 
@@ -131,6 +132,11 @@ define(function(require, exports) {
                         })[0];
                         if(!currentVehicle){//新选的车，加入用户车辆列表
                             currentVehicle = Model.find(params.model_id);
+                            var series = Series.find(currentVehicle.familyId);
+                            var brand = Brand.find(series.brandId);
+                            currentVehicle.prefix = series.prefix;
+                            currentVehicle.family = series.family;
+                            currentVehicle.brand = brand.brand;
                             if(currentVehicle){
                                 currentVehicle.modelId = currentVehicle.id;
                                 currentVehicle.save();
@@ -140,7 +146,7 @@ define(function(require, exports) {
                                 self.page.navigate('/service/' + params.service_id + '/brand');
                                 return;
                             }
-                        }else{//把用户选中的车，挪到用户车辆列表中的第一个
+                        }else{//把用户选中的车（库中本来已经存在的），挪到用户车辆列表中的第一个
                             vehicles = [currentVehicle].concat(vehicles.filter(function(v){
                                 return v.modelId != currentVehicle.modelId;
                             }));
@@ -148,6 +154,11 @@ define(function(require, exports) {
                     }else{
                         //新选的车，加到用户车辆列表
                         currentVehicle = Model.find(params.model_id);
+                        var series = Series.find(currentVehicle.familyId);
+                        var brand = Brand.find(series.brandId);
+                        currentVehicle.prefix = series.prefix;
+                        currentVehicle.family = series.family;
+                        currentVehicle.brand = series.brand;
                         if(currentVehicle){
                             currentVehicle.modelId = currentVehicle.id;
                             currentVehicle.save();
@@ -210,7 +221,7 @@ define(function(require, exports) {
                     }
                 }
             });
-            self.currrentOrder.sum = totalPrice;
+            self.currentOrder.sum = totalPrice;
             totalPriceEl.html(totalPrice);
             totalPriceEl.attr('data-totalprice', totalPrice);
         }
@@ -218,7 +229,8 @@ define(function(require, exports) {
             var optArrs = [
                     /*['奥迪 国产A4 1.8T']*/
                     data.allVehicles.map(function(v){
-                        return [v.model]
+                        //prefix+brand+family+model+suffix
+                        return [v.prefix + v.brand + v.family + v.model + v.suffix]
                     }).concat([['重新选车']])
                 ,
                 [
@@ -290,7 +302,7 @@ define(function(require, exports) {
                                         self.page.navigate('/service/' + data.service_id + '/brand');
                                     }else if(selectedIndex >= 0){
                                         data.currentVehicle = data.allVehicles[selectedIndex];
-                                        self.currrentOrder.__currentVehicle = data.currentVehicle;
+                                        self.currentOrder.__currentVehicle = data.currentVehicle;
                                         data.model_id =data.currentVehicle.modelId;
                                     }
                                 }

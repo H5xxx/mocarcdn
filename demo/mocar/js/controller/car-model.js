@@ -21,8 +21,12 @@ define(function(require, exports) {
                 list.forEach(function(m){
                     m = Model.find(m.id);
                     m.brandId = params.brand_id;
-                    m.seriesId = params.series_id;
-                    m.save();
+                    m.familyId = params.series_id;
+                    try{
+                        m.save();
+                    }catch(e){
+                        debugger;
+                    }
                 });
                 data = $.extend(
                     {
